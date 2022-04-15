@@ -1,4 +1,5 @@
 import math
+from scipy import stats
 from typing import Optional
 
 
@@ -22,6 +23,11 @@ def recall(true_relevance: list, predicted_relevance: list, cutoff: int):
     intersection = set(true_relevance[:cutoff]) & set(predicted_relevance[:cutoff])
     recall_score = len(intersection)/len(true_relevance)
     return recall_score
+
+
+def kendall_tau(true_relevance: list, predicted_relevance: list, cutoff: int):
+    tau, _ = stats.kendalltau(true_relevance[:cutoff], predicted_relevance[:cutoff])
+    return tau
 
 
 
