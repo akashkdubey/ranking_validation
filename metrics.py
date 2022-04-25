@@ -1,10 +1,15 @@
 import math
 from scipy import stats
+from sklearn.metrics import ndcg_score
 from typing import Optional
+
+from typing import Optional
+import math
+import numpy as np
 
 
 def ndcg(true_relevance: list, predicted_relevance: list, cutoff: int):
-    def cumm_gain(relevance_scores: list, log_vals: list, cutoff: int) -> int:
+    def cumm_gain(relevance_scores: list, log_vals: list, cutoff: int):
         cumm_sum = 0
         for index, relevance_value in enumerate(relevance_scores[:cutoff]):
             num = 2 ** relevance_value - 1
@@ -12,9 +17,9 @@ def ndcg(true_relevance: list, predicted_relevance: list, cutoff: int):
             cumm_sum += num / den
         return cumm_sum
 
-    discount_factor = [math.log(i + 1, 2) for i in range(1, len(true_relevance))]
-    dcg = cumm_gain(predicted_relevance, discount_factor, cutoff)
-    ideal_dcg = cumm_gain(true_relevance, discount_factor, cutoff)
+    log_vals = np.log2([index + 1 for index in range(1, len(true_relevance) + 1)])
+    dcg = cumm_gain(predicted_relevance, log_vals, cutoff)
+    ideal_dcg = cumm_gain(true_relevance, log_vals, cutoff)
     ndcg_score = dcg / ideal_dcg
     return ndcg_score
 
