@@ -6,8 +6,8 @@ class ValidationGenerator:
         self.predicted_relevance_items = predicted_relevance_items
 
     @staticmethod
-    def prep_for_normalisation(true_relevance_items: list, true_relevance_scores: list,
-                               predicted_relevance_items: list):
+    def prep_relevances(true_relevance_items: list, true_relevance_scores: list,
+                        predicted_relevance_items: list):
         normalised_true_relevance = list(zip(true_relevance_items, true_relevance_scores))
         true_dict = dict(normalised_true_relevance)
         normalised_predicted_relevance = []  # list of tuples
@@ -17,4 +17,3 @@ class ValidationGenerator:
             else:
                 normalised_predicted_relevance.append((predicted_item, 0))
         return normalised_true_relevance, normalised_predicted_relevance
-
