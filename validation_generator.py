@@ -1,3 +1,6 @@
+from src.metrics import *
+
+
 class ValidationGenerator:
 
     def __init__(self, true_relevance_items=None, true_relevance_scores=None, predicted_relevance_items=None):
@@ -20,3 +23,33 @@ class ValidationGenerator:
                 normalised_predicted_relevance.append((predicted_item, 0))
 
         return normalised_true_relevance, normalised_predicted_relevance
+
+    @staticmethod
+    def generate_scores(true_relevance_items: list, true_relevance_scores: list, predicted_relevance_items: list,
+                        metrics_list: list, cutoff_list: list):
+
+        true_rel, pred_rel = ValidationGenerator.prep_relevances(true_relevance_items, true_relevance_scores,
+                                                                 predicted_relevance_items)
+
+        true_rel_items, true_rel_scores = list(map(list, zip(*true_rel)))
+        pred_rel_items, pred_rel_scores = list(map(list, zip(*pred_rel)))
+
+        if "ndcg" in metrics_list:
+            for cutoff in cutoff_list:
+                ndcg_scores = [ndcg(true_rel_scores, pred_rel_scores, cutoff)]
+
+        if "kendalltau" in metrics_list:
+            for cutoff in cutoff_list:
+                tau_scores = [kendall_tau(true_rel_items, pred_rel_items, cutoff)]
+
+        if "recall" in metrics_list:
+            for cutoff in cutoff_list:
+                recall_scores = [recall(true_rel_items, pred_rel_items, cutoff)]
+
+        if "rbo" in metrics_list:
+            for cutoff in cutoff_list:
+                pass
+        # rbo_scores = [rbo(true_rel_items, pred_rel_scores, cutoff)]
+
+
+
