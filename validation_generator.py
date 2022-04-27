@@ -48,8 +48,7 @@ class ValidationGenerator:
 
         if "rbo" in metrics_list:
             for cutoff in cutoff_list:
-                pass
-        # rbo_scores = [rbo(true_rel_items, pred_rel_scores, cutoff)]
+                rbo_scores = [rbo_sim(true_rel_items, pred_rel_scores, cutoff)]
 
 
 

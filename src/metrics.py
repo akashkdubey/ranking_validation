@@ -1,3 +1,4 @@
+import rbo
 import math
 from scipy import stats
 from sklearn.metrics import ndcg_score
@@ -26,7 +27,7 @@ def ndcg(true_relevance: list, predicted_relevance: list, cutoff: int):
 
 def recall(true_relevance: list, predicted_relevance: list, cutoff: int):
     intersection = set(true_relevance[:cutoff]) & set(predicted_relevance[:cutoff])
-    recall_score = len(intersection)/len(true_relevance)
+    recall_score = len(intersection) / len(true_relevance)
     return recall_score
 
 
@@ -35,5 +36,6 @@ def kendall_tau(true_relevance: list, predicted_relevance: list, cutoff: int):
     return tau
 
 
-
-
+def rbo_sim(true_relevance: list, predicted_relevance: list, cutoff: int):
+    rbo_score = rbo.RankingSimilarity(true_relevance[:cutoff], predicted_relevance[:cutoff]).rbo()
+    return rbo_score
