@@ -9,8 +9,8 @@ class ValidationGenerator:
         self.predicted_relevance_items = predicted_relevance_items
 
     @staticmethod
-    def prep_relevances(true_relevance_items: list, true_relevance_scores: list,
-                        predicted_relevance_items: list):
+    def adjust_relevances(true_relevance_items: list, true_relevance_scores: list,
+                          predicted_relevance_items: list):
 
         normalised_true_relevance = list(zip(true_relevance_items, true_relevance_scores))
 
@@ -28,8 +28,8 @@ class ValidationGenerator:
     def generate_scores(true_relevance_items: list, true_relevance_scores: list, predicted_relevance_items: list,
                         metrics_list: list, cutoff_list: list):
 
-        true_rel, pred_rel = ValidationGenerator.prep_relevances(true_relevance_items, true_relevance_scores,
-                                                                 predicted_relevance_items)
+        true_rel, pred_rel = ValidationGenerator.adjust_relevances(true_relevance_items, true_relevance_scores,
+                                                                   predicted_relevance_items)
 
         true_rel_items, true_rel_scores = list(map(list, zip(*true_rel)))
         pred_rel_items, pred_rel_scores = list(map(list, zip(*pred_rel)))
@@ -51,4 +51,4 @@ class ValidationGenerator:
                 rbo_scores = [rbo_sim(true_rel_items, pred_rel_scores, cutoff)]
 
 
-
+if __name__ == "__main__":
