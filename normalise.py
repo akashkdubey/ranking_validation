@@ -15,11 +15,11 @@ class OrderedSet(collections.Set):
         return iter(self.d)
 
 
-def normalise_for_kendalltau(true_relevance, predicted_relevance):
-    add_to_true_rel = list(OrderedSet(predicted_relevance) - OrderedSet(true_relevance))
-    add_to_pred_rel = list(OrderedSet(true_relevance) - OrderedSet(predicted_relevance))
-    norm_true_rel = list(OrderedSet(true_relevance)) + add_to_true_rel
-    norm_pred_rel = list(OrderedSet(predicted_relevance)) + add_to_pred_rel
+def normalise_for_kendalltau(true_relevance, predicted_relevance, cutoff):
+    add_to_true_rel = list(OrderedSet(predicted_relevance[:cutoff]) - OrderedSet(true_relevance[:cutoff]))
+    add_to_pred_rel = list(OrderedSet(true_relevance[:cutoff]) - OrderedSet(predicted_relevance[:cutoff]))
+    norm_true_rel = list(OrderedSet(true_relevance[:cutoff])) + add_to_true_rel
+    norm_pred_rel = list(OrderedSet(predicted_relevance[:cutoff])) + add_to_pred_rel
     return norm_true_rel, norm_pred_rel
 
 

@@ -1,7 +1,10 @@
 import rbo
+import numpy as np
+
 from scipy import stats
 from typing import Optional
-import numpy as np
+
+from normalise import *
 
 
 def ndcg(true_relevance: list, predicted_relevance: list, cutoff: int):
@@ -27,6 +30,7 @@ def recall(true_relevance: list, predicted_relevance: list, cutoff: int):
 
 
 def kendall_tau(true_relevance: list, predicted_relevance: list, cutoff: int):
+    true_relevance, predicted_relevance = normalise_for_kendalltau(true_relevance, predicted_relevance, cutoff)
     tau, _ = stats.kendalltau(true_relevance[:cutoff], predicted_relevance[:cutoff])
     return tau
 
