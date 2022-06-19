@@ -16,7 +16,7 @@ def ndcg(true_relevance: list, predicted_relevance: list, cutoff: int):
             cumm_sum += num / den
         return cumm_sum
 
-    log_vals = np.log2([index + 1 for index in range(1, len(true_relevance) + 1)])
+    log_vals = np.log2([index + 1 for index in range(1, cutoff + 2)])
     dcg = cumm_gain(predicted_relevance, log_vals, cutoff)
     ideal_dcg = cumm_gain(true_relevance, log_vals, cutoff)
     ndcg_score = dcg / ideal_dcg
