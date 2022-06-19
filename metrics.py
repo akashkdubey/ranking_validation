@@ -4,7 +4,7 @@ import numpy as np
 from scipy import stats
 from typing import Optional
 
-from normalise import *
+from normalise import normalise_for_kendalltau
 
 
 def ndcg(true_relevance: list, predicted_relevance: list, cutoff: int):
