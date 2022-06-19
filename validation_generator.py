@@ -1,7 +1,8 @@
 import pandas as pd
 
-from ranking_validation.src.normalise import normalise_relevance
-from src.metrics import *
+from ranking_validation.normalise import normalise_relevance
+from ranking_validation.metrics import *
+import swifter
 
 
 class ValidationGenerator:

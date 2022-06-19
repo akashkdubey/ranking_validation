@@ -1,4 +1,18 @@
-from utils import OrderedSet
+import collections
+
+
+class OrderedSet(collections.Set):
+    def __init__(self, iterable=()):
+        self.d = collections.OrderedDict.fromkeys(iterable)
+
+    def __len__(self):
+        return len(self.d)
+
+    def __contains__(self, item):
+        return item in self.d
+
+    def __iter__(self):
+        return iter(self.d)
 
 
 def normalise_for_kendalltau(true_relevance, predicted_relevance):
