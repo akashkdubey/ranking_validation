@@ -28,21 +28,21 @@ class ValidationGenerator:
             for cutoff in cutoff_list:
                 col_name = "ndcg@" + str(cutoff)
                 df[col_name] = df.swifter.apply(lambda x: ndcg(x[truth_score_col], x[pred_score_col], cutoff), axis=1)
+
         if "recall" in metric_list:
             for cutoff in cutoff_list:
                 col_name = "recall@" + str(cutoff)
-                df[col_name] = df.swifter.apply(lambda x: recall(x[truth_score_col], x[pred_score_col], cutoff), axis=1)
+                df[col_name] = df.swifter.apply(lambda x: recall(x[truth_item_col], x[pred_item_col], cutoff), axis=1)
 
         if "kendall_tau" in metric_list:
             for cutoff in cutoff_list:
                 col_name = "kendall_tau@" + str(cutoff)
-                df[col_name] = df.swifter.apply(lambda x: kendall_tau(x[truth_score_col], x[pred_score_col], cutoff), axis=1)
+                df[col_name] = df.swifter.apply(lambda x: kendall_tau(x[truth_item_col], x[pred_item_col], cutoff), axis=1)
 
         if "rbo" in metric_list:
             for cutoff in cutoff_list:
                 col_name = "rbo@" + str(cutoff)
-                df[col_name] = df.swifter.apply(
-                    lambda x: rbo_sim(x[truth_score_col], x[pred_score_col], cutoff), axis=1)
+                df[col_name] = df.swifter.apply(lambda x: rbo_sim(x[truth_item_col], x[pred_item_col], cutoff), axis=1)
 
         return df
 
