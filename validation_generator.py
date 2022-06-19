@@ -1,54 +1,61 @@
+import pandas as pd
+
+from ranking_validation.src.normalise import normalise_relevance
 from src.metrics import *
 
 
 class ValidationGenerator:
 
-    def __init__(self, true_relevance_items=None, true_relevance_scores=None, predicted_relevance_items=None):
-        self.true_relevance_items = true_relevance_items
-        self.true_relevance_scores = true_relevance_scores
-        self.predicted_relevance_items = predicted_relevance_items
+    def __init__(self):
+        pass
 
     @staticmethod
-    def adjust_relevances(true_relevance_items: list, true_relevance_scores: list,
-                          predicted_relevance_items: list):
+    def prepare_relevance(truth_items: list, truth_scores: list, pred_items: list):
 
-        normalised_true_relevance = list(zip(true_relevance_items, true_relevance_scores))
+        truth_rel, pred_rel = normalise_relevance(truth_items, truth_scores, pred_items)
 
-        true_relevance_dict = dict(normalised_true_relevance)
-        normalised_predicted_relevance = []  # list of tuples
-        for predicted_item in predicted_relevance_items:
-            if predicted_item in true_relevance_dict:
-                normalised_predicted_relevance.append((predicted_item, true_relevance_dict[predicted_item]))
-            else:
-                normalised_predicted_relevance.append((predicted_item, 0))
-
-        return normalised_true_relevance, normalised_predicted_relevance
-
-    @staticmethod
-    def generate_scores(true_relevance_items: list, true_relevance_scores: list, predicted_relevance_items: list,
-                        metrics_list: list, cutoff_list: list):
-
-        true_rel, pred_rel = ValidationGenerator.adjust_relevances(true_relevance_items, true_relevance_scores,
-                                                                   predicted_relevance_items)
-
-        true_rel_items, true_rel_scores = list(map(list, zip(*true_rel)))
+        truth_rel_items, truth_rel_scores = list(map(list, zip(*truth_rel)))
         pred_rel_items, pred_rel_scores = list(map(list, zip(*pred_rel)))
 
-        if "ndcg" in metrics_list:
-            for cutoff in cutoff_list:
-                ndcg_scores = [ndcg(true_rel_scores, pred_rel_scores, cutoff)]
+        return pd.Series([truth_rel_items, truth_rel_scores, pred_rel_items, pred_rel_scores])
 
-        if "kendalltau" in metrics_list:
-            for cutoff in cutoff_list:
-                tau_scores = [kendall_tau(true_rel_items, pred_rel_items, cutoff)]
+    @staticmethod
+    def create_metric_cols(df, truth_item_col, truth_score_col, pred_item_col, pred_score_col, metric_list,
+                           cutoff_list):
 
-        if "recall" in metrics_list:
+        if "ndcg" in metric_list:
             for cutoff in cutoff_list:
-                recall_scores = [recall(true_rel_items, pred_rel_items, cutoff)]
+                col_name = "ndcg@" + str(cutoff)
+                df[col_name] = df.swifter.apply(lambda x: ndcg(x[truth_score_col], x[pred_score_col], cutoff, axis=1))
+        if "recall" in metric_list:
+            for cutoff in cutoff_list:
+                col_name = "recall@" + str(cutoff)
+                df[col_name] = df.swifter.apply(lambda x: recall(x[truth_score_col], x[pred_score_col], cutoff, axis=1))
 
-        if "rbo" in metrics_list:
+        if "kendall_tau" in metric_list:
             for cutoff in cutoff_list:
-                rbo_scores = [rbo_sim(true_rel_items, pred_rel_scores, cutoff)]
+                col_name = "kendall_tau@" + str(cutoff)
+                df[col_name] = df.swifter.apply(
+                    lambda x: kendall_tau(x[truth_score_col], x[pred_score_col], cutoff, axis=1))
+
+        if "rbo" in metric_list:
+            for cutoff in cutoff_list:
+                col_name = "rbo@" + str(cutoff)
+                df[col_name] = df.swifter.apply(
+                    lambda x: rbo_sim(x[truth_score_col], x[pred_score_col], cutoff, axis=1))
+
+        return df
+
+    @staticmethod
+    def get_metrics_report(df, truth_item_col, truth_score_col, pred_item_col, metric_list, cutoff_list):
+        df[[truth_item_col, truth_score_col, pred_item_col, "pred_score_col"]] = df.swifter.apply(
+            lambda x: ValidationGenerator.prepare_relevance(x[truth_item_col], x[truth_score_col], x[pred_item_col],
+                                                            axis=1))
+        df_scored = ValidationGenerator.create_metric_cols(df, truth_item_col, truth_score_col,
+                                                           pred_item_col, "pred_score_col", metric_list, cutoff_list)
+        df_scored = df_scored.drop([truth_item_col, truth_score_col, pred_item_col, "pred_score_col"], axis=1)
+        return df_scored
 
 
 if __name__ == "__main__":
+    pass
