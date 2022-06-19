@@ -37,8 +37,7 @@ class ValidationGenerator:
         if "kendall_tau" in metric_list:
             for cutoff in cutoff_list:
                 col_name = "kendall_tau@" + str(cutoff)
-                df[col_name] = df.swifter.apply(lambda x: kendall_tau(x[truth_item_col], x[pred_item_col], cutoff),
-                                                axis=1)
+                df[col_name] = df.swifter.apply(lambda x: kendall_tau(x[truth_item_col], x[pred_item_col], cutoff), axis=1)
 
         if "rbo" in metric_list:
             for cutoff in cutoff_list:
