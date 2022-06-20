@@ -1,5 +1,6 @@
 import pandas as pd
-import swifter
+
+from typing import List
 
 from metrics import ndcg, recall, kendall_tau, rbo_sim
 from normalise import normalise_relevance
@@ -11,7 +12,9 @@ class ValidationGenerator:
         pass
 
     @staticmethod
-    def prepare_relevance(truth_items: list, truth_scores: list, pred_items: list):
+    def prepare_relevance(truth_items: List[str],
+                          truth_scores: List[int | float],
+                          pred_items: List[str]) -> pd.Series:
 
         truth_rel, pred_rel = normalise_relevance(truth_items, truth_scores, pred_items)
 
@@ -21,8 +24,13 @@ class ValidationGenerator:
         return pd.Series([truth_rel_items, truth_rel_scores, pred_rel_items, pred_rel_scores])
 
     @staticmethod
-    def create_metric_cols(df, truth_item_col, truth_score_col, pred_item_col, pred_score_col, metric_list,
-                           cutoff_list):
+    def create_metric_cols(df: pd.DataFrame,
+                           truth_item_col: pd.Series,
+                           truth_score_col: pd.Series,
+                           pred_item_col: pd.Series,
+                           pred_score_col: pd.Series,
+                           metric_list: List[str],
+                           cutoff_list: List[int]) -> pd.DataFrame:
 
         if "ndcg" in metric_list:
             for cutoff in cutoff_list:
@@ -47,7 +55,13 @@ class ValidationGenerator:
         return df
 
     @staticmethod
-    def get_metrics_report(df, truth_item_col, truth_score_col, pred_item_col, metric_list, cutoff_list):
+    def get_metrics_report(df: pd.DataFrame,
+                           truth_item_col: pd.Series,
+                           truth_score_col: pd.Series,
+                           pred_item_col: pd.Series,
+                           metric_list : List[str],
+                           cutoff_list: List[int]) -> pd.DataFrame:
+
         df[[truth_item_col, truth_score_col, pred_item_col, "pred_score_col"]] = df.swifter.apply(
             lambda x: ValidationGenerator.prepare_relevance(x[truth_item_col], x[truth_score_col], x[pred_item_col]),
             axis=1)

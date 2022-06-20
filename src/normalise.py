@@ -1,4 +1,5 @@
 import collections
+from typing import List, Tuple
 
 
 class OrderedSet(collections.Set):
@@ -15,7 +16,10 @@ class OrderedSet(collections.Set):
         return iter(self.d)
 
 
-def normalise_for_kendalltau(true_relevance, predicted_relevance, cutoff):
+def normalise_for_kendalltau(true_relevance: List[str],
+                             predicted_relevance: List[str],
+                             cutoff: int) -> Tuple[List[str], List[str]]:
+
     add_to_true_rel = list(OrderedSet(predicted_relevance[:cutoff]) - OrderedSet(true_relevance[:cutoff]))
     add_to_pred_rel = list(OrderedSet(true_relevance[:cutoff]) - OrderedSet(predicted_relevance[:cutoff]))
     norm_true_rel = list(OrderedSet(true_relevance[:cutoff])) + add_to_true_rel
@@ -23,8 +27,9 @@ def normalise_for_kendalltau(true_relevance, predicted_relevance, cutoff):
     return norm_true_rel, norm_pred_rel
 
 
-def normalise_relevance(true_relevance_items: list, true_relevance_scores: list,
-                        predicted_relevance_items: list):
+def normalise_relevance(true_relevance_items: List[str],
+                        true_relevance_scores: List[int | float],
+                        predicted_relevance_items: List[str]) -> Tuple[List[Tuple[str, int | float]], List[Tuple[str, int | float]]]:
     normalised_true_relevance = list(zip(true_relevance_items, true_relevance_scores))
 
     true_relevance_dict = dict(normalised_true_relevance)
