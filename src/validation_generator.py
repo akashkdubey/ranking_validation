@@ -13,7 +13,7 @@ class ValidationGenerator:
 
     @staticmethod
     def prepare_relevance(truth_items: List[str],
-                          truth_scores: List[int | float],
+                          truth_scores: List[float],
                           pred_items: List[str]) -> pd.Series:
 
         truth_rel, pred_rel = normalise_relevance(truth_items, truth_scores, pred_items)

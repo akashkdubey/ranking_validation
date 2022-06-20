@@ -7,11 +7,11 @@ from typing import List
 from normalise import normalise_for_kendalltau
 
 
-def ndcg(true_relevance: List[int | float],
-         predicted_relevance: List[int | float],
-         cutoff: int) -> int | float:
+def ndcg(true_relevance: List[float],
+         predicted_relevance: List[float],
+         cutoff: int) -> float:
 
-    def cumm_gain(relevance_scores: List[int | float], log_vals: List[int], cutoff: int):
+    def cumm_gain(relevance_scores: List[float], log_vals: List[int], cutoff: int):
         cumm_sum = 0
         for index, relevance_value in enumerate(relevance_scores[:cutoff]):
             num = 2 ** relevance_value - 1
@@ -28,7 +28,7 @@ def ndcg(true_relevance: List[int | float],
 
 def recall(true_relevance: List[str],
            predicted_relevance: List[str],
-           cutoff: int) -> int | float:
+           cutoff: int) -> float:
 
     intersection = set(true_relevance[:cutoff]) & set(predicted_relevance[:cutoff])
     recall_score = len(intersection) / len(true_relevance)
@@ -37,7 +37,7 @@ def recall(true_relevance: List[str],
 
 def kendall_tau(true_relevance:  List[str],
                 predicted_relevance:  List[str],
-                cutoff: int) -> int | float:
+                cutoff: int) -> float:
 
     true_relevance, predicted_relevance = normalise_for_kendalltau(true_relevance, predicted_relevance, cutoff)
     tau, _ = stats.kendalltau(true_relevance[:cutoff], predicted_relevance[:cutoff])
@@ -46,6 +46,7 @@ def kendall_tau(true_relevance:  List[str],
 
 def rbo_sim(true_relevance:  List[str],
             predicted_relevance:  List[str],
-            cutoff: int) -> int | float:
+            cutoff: int) -> float:
+
     rbo_score = rbo.RankingSimilarity(true_relevance[:cutoff], predicted_relevance[:cutoff]).rbo()
     return rbo_score

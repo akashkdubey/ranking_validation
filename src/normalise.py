@@ -28,8 +28,8 @@ def normalise_for_kendalltau(true_relevance: List[str],
 
 
 def normalise_relevance(true_relevance_items: List[str],
-                        true_relevance_scores: List[int | float],
-                        predicted_relevance_items: List[str]) -> Tuple[List[Tuple[str, int | float]], List[Tuple[str, int | float]]]:
+                        true_relevance_scores: List[float],
+                        predicted_relevance_items: List[str]) -> Tuple[List[Tuple[str, float]], List[Tuple[str, float]]]:
 
     normalised_true_relevance = list(zip(true_relevance_items, true_relevance_scores))
     true_relevance_dict = dict(normalised_true_relevance)
@@ -39,5 +39,4 @@ def normalise_relevance(true_relevance_items: List[str],
             normalised_predicted_relevance.append((predicted_item, true_relevance_dict[predicted_item]))
         else:
             normalised_predicted_relevance.append((predicted_item, 0))
-
     return normalised_true_relevance, normalised_predicted_relevance
