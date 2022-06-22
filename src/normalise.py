@@ -19,6 +19,13 @@ class OrderedSet(collections.Set):
 def normalise_for_kendalltau(true_relevance: List[str],
                              predicted_relevance: List[str],
                              cutoff: int) -> Tuple[List[str], List[str]]:
+    """
+
+    :param true_relevance: list of ground truth items (doc ids).
+    :param predicted_relevance: list of predicted items (doc ids).
+    :param cutoff: The depth of the list to consider for rank validation.
+    :return: Normalised true relevance items (doc ids) and normalised predicted relevance items (doc ids)
+    """
 
     add_to_true_rel = list(OrderedSet(predicted_relevance[:cutoff]) - OrderedSet(true_relevance[:cutoff]))
     add_to_pred_rel = list(OrderedSet(true_relevance[:cutoff]) - OrderedSet(predicted_relevance[:cutoff]))
@@ -30,6 +37,13 @@ def normalise_for_kendalltau(true_relevance: List[str],
 def normalise_relevance(true_relevance_items: List[str],
                         true_relevance_scores: List[float],
                         predicted_relevance_items: List[str]) -> Tuple[List[Tuple[str, float]], List[Tuple[str, float]]]:
+    """
+
+    :param true_relevance_items: list of ground truth items (doc ids)
+    :param true_relevance_scores: list of relevancy scores, corresponding to the items(doc ids) in truth_items
+    :param predicted_relevance_items: list of predicted lists of the items(doc ids)
+    :return: Two list of tuples with (item, score), each for ground truth and the prediction
+    """
 
     normalised_true_relevance = list(zip(true_relevance_items, true_relevance_scores))
     true_relevance_dict = dict(normalised_true_relevance)
