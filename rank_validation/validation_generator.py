@@ -1,7 +1,6 @@
 import pandas as pd
-import swifter
 from typing import List, Tuple
-
+import swifter
 from metrics import ndcg, recall, kendall_tau, rbo_sim
 from normalise import normalise_relevance
 
