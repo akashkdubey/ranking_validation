@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="rank_validation",
-    version="0.0.7",
+    version="1.0.2",
     description="creates a rank validation report",
     py_modules=["validation_generator", "metrics", "normalise"],
     install_requires=["numpy", "pandas", "swifter", "rbo", "scipy", "typing"],

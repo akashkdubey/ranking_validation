@@ -1,10 +1,10 @@
 import rbo
 import numpy as np
-
+import swifter
 from scipy import stats
 from typing import List
 
-from normalise import normalise_for_kendalltau
+from .normalise import normalise_for_kendalltau
 
 
 def ndcg(true_relevance: List[float],
@@ -16,6 +16,7 @@ def ndcg(true_relevance: List[float],
     :param cutoff: The depth of the list to consider for rank validation.
     :return:
     """
+    true_relevance = sorted(true_relevance, reverse=True)
 
     def cumm_gain(relevance_scores: List[float], log_vals: List[int], cutoff: int):
         """

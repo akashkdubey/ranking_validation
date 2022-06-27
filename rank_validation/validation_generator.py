@@ -1,8 +1,10 @@
+import swifter
+
 import pandas as pd
 from typing import List, Tuple
-import swifter
-from metrics import ndcg, recall, kendall_tau, rbo_sim
-from normalise import normalise_relevance
+
+from .metrics import ndcg, recall, kendall_tau, rbo_sim
+from .normalise import normalise_relevance
 
 
 def prepare_relevance(truth_items: List[str],
