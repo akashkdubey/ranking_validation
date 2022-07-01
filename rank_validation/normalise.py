@@ -20,7 +20,6 @@ def normalise_for_kendalltau(true_relevance: List[str],
                              predicted_relevance: List[str],
                              cutoff: int) -> Tuple[List[str], List[str]]:
     """
-
     :param true_relevance: list of ground truth items (doc ids).
     :param predicted_relevance: list of predicted items (doc ids).
     :param cutoff: The depth of the list to consider for rank validation.
@@ -38,7 +37,6 @@ def normalise_relevance(true_relevance_items: List[str],
                         true_relevance_scores: List[float],
                         predicted_relevance_items: List[str]) -> Tuple[List[Tuple[str, float]], List[Tuple[str, float]]]:
     """
-
     :param true_relevance_items: list of ground truth items (doc ids)
     :param true_relevance_scores: list of relevancy scores, corresponding to the items(doc ids) in truth_items
     :param predicted_relevance_items: list of predicted lists of the items(doc ids)
