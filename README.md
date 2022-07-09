@@ -27,8 +27,8 @@ Current version supports the following metrics: <br>
  - rbo <br>
 <br >
 
-**Note : rbo might run into errors if : `len(set(ground_truth_items)) != len(set(predicted_items))`, so if rbo gives an
-error, try generating the report with other metrics available** 
+**Note** : rbo might run into errors if : `len(set(ground_truth_items)) != len(set(predicted_items))`, so if rbo gives an
+error, try generating the report with other metrics available.
 
 
 
