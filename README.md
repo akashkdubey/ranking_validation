@@ -22,7 +22,7 @@ query_report, overall_report = get_metrics_report(df, truth item column, truth s
 Current version supports the following metrics: <br>
 <br>
 <br>
-  **ndcg** <br>
+ -  **ndcg** <br>
  -  **kendall_tau** <br>
  -  **recall** <br>
  -  **rbo** <br>
