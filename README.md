@@ -21,10 +21,10 @@ query_report, overall_report = get_metrics_report(df, truth item column, truth s
 <br>
 Current version supports the following metrics: <br>
 <br>
-- `ndcg` <br>
-- `kendall_tau` <br>
-- `recall` <br>
-- `rbo` <br>
+- ndcg <br>
+- kendall_tau <br>
+- recall <br>
+- rbo <br>
 <br >
 
 **Note** : rbo might run into errors if : `len(set(ground_truth_items)) != len(set(predicted_items))`, so if rbo gives an
