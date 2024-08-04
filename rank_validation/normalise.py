@@ -1,8 +1,9 @@
 import collections
+from collections.abc import Set
 from typing import List, Tuple
 
 
-class OrderedSet(collections.Set):
+class OrderedSet(Set):
     def __init__(self, iterable=()):
         self.d = collections.OrderedDict.fromkeys(iterable)
 
