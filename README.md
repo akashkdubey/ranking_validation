@@ -1,3 +1,5 @@
+[![Downloads](https://static.pepy.tech/badge/rank-validation)](https://pepy.tech/project/rank-validation)
+
 # Ranking Validation
 This python package generates two ranking validation reports, one is a query level report that would contain information
 on the metrics provided as input and the overall metrics report which is a summarised version of query level report. 
