@@ -1,6 +1,8 @@
 [![PyPI version](https://badge.fury.io/py/rank-validation.svg)](https://badge.fury.io/py/rank-validation) 
 [![Downloads](https://static.pepy.tech/badge/rank-validation)](https://pepy.tech/project/rank-validation)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![PyPI version](https://img.shields.io/pypi/v/rank-validation?label=PyPI)](https://pypi.org/project/rank-validation/)
+
 
 # **rank‑validation**
 
