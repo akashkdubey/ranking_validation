@@ -12,12 +12,12 @@
 
 ## ✨ Key features
 
-- **Simple API** – `get_metrics_report(...)` returns pandas DataFrames you already know how to use.
-- **Out‑of‑the‑box metrics** – nDCG, Recall, Kendall’s τ, RBO (extendable).
-- **Arbitrary cut‑offs** – evaluate at @1, @5, @20… whatever matters.
-- **Automatic score alignment** – helper utilities map prediction lists onto truth scores for graded relevance.
-- **Parallelised with [swifter]** – scales to millions of queries on a laptop.
-- **Pure Python ≥3.8** – zero native extensions.
+- **Simple API** – `get_metrics_report(...)` returns pandas DataFrames you already know how to use.  
+- **Out‑of‑the‑box metrics** – nDCG, Recall, Kendall’s τ, RBO (extendable).  
+- **Arbitrary cut‑offs** – evaluate at @1, @5, @20… whatever matters.  
+- **Automatic score alignment** – helper utilities map prediction lists onto truth scores for graded relevance.  
+- **Vectorised NumPy & Pandas core** – scales to millions of queries on a laptop.  
+- **Pure Python ≥ 3.8** – zero native extensions.
 
 ---
 
@@ -27,7 +27,7 @@
 pip install rank-validation
 ```
 
-The wheel is lightweight (<30 KB) and pulls in only numpy, pandas, scipy, swifter & rbo.
+The wheel is lightweight (< 30 KB) and pulls in only **numpy**, **pandas**, **scipy** & **rbo**.
 
 ---
 
@@ -37,16 +37,11 @@ The wheel is lightweight (<30 KB) and pulls in only numpy, pandas, scipy, swift
 import pandas as pd
 from rank_validation.validation_generator import get_metrics_report
 
-# 1️⃣  Each row = one query
-#     truth_items  : ground‑truth doc IDs ordered by relevance
-#     truth_scores : integer / float relevance grades (same length as truth_items)
-#     pred_items   : system‑predicted ranked list
-
 df = pd.DataFrame({
     "query": ["q1", "q2"],
-    "truth_items":  [["A","B","C","D"],   ["X","Y","Z"]],
-    "truth_scores": [[3,2,1,0],            [2,1,0]],
-    "pred_items":   [["B","A","E","C"],   ["Y","X","Z"]],
+    "truth_items":  [["A","B","C","D"], ["X","Y","Z"]],
+    "truth_scores": [[3,2,1,0],          [2,1,0]],
+    "pred_items":   [["B","A","E","C"], ["Y","X","Z"]],
 })
 
 metrics  = ["ndcg", "recall", "kendall_tau", "rbo"]
@@ -61,20 +56,16 @@ query_report, overall_report = get_metrics_report(
     cutoff_list=cutoffs,
 )
 
-print(query_report.head())      # per‑query breakdown
-print(overall_report)           # summary stats (mean, std, …)
+print(query_report.head())  # per‑query breakdown
+print(overall_report)       # summary stats (mean, std, …)
 ```
 
 Typical output:
 
 ```
   query  ndcg@3  recall@3  kendall_tau@3  rbo@3  ndcg@5  recall@5  kendall_tau@5  rbo@5
-0    q1   0.91      0.67           0.33   0.79    0.90      1.00           0.33   0.79
-1    q2   1.00      0.67           0.67   1.00    1.00      1.00           0.67   1.00
-
-        ndcg@3  recall@3  ...  kendall_tau@5  rbo@5
-mean      0.96      0.67  ...           0.50    0.90
-std       0.06      0.00  ...           0.24    0.15
+0    q1    0.91      0.67           0.33   0.79    0.90      1.00           0.33   0.79
+1    q2    1.00      0.67           0.67   1.00    1.00      1.00           0.67   1.00
 ```
 
 ---
@@ -83,10 +74,10 @@ std       0.06      0.00  ...           0.24    0.15
 
 | Metric | What it measures | Reference |
 | ------ | ---------------- | --------- |
-| **nDCG@k** | Graded relevance with log‑discounted gain, normalised by ideal ranking | Järvelin & Kekäläinen (2002) |
-| **Recall@k** | Proportion of ground‑truth items retrieved in top k | – |
+| **nDCG@k** | Graded relevance with log‑discounted gain, normalised by ideal ranking | Järvelin & Kekäläinen (2002) |
+| **Recall@k** | Proportion of ground‑truth items retrieved in top k | – |
 | **Kendall’s τ@k** | Rank correlation, ties handled via normalisation | Kendall (1938) |
-| **RBO@k** | Top‑weighted similarity between two indefinite rankings | Webber et al. (2010) |
+| **RBO@k** | Top‑weighted similarity between two indefinite rankings | Webber et al. (2010) |
 
 > **Heads‑up:** RBO requires the two lists to have unique items and equalised lengths. If you hit `RankingSimilarity` errors, drop duplicates beforehand or omit RBO for that experiment.
 
@@ -116,15 +107,15 @@ def get_metrics_report(
 
 Returns `(query_report, overall_report)` where:
 
-- **query_report** – original df plus metric columns.
+- **query_report** – original df plus metric columns.  
 - **overall_report** – `query_report.describe()` (mean, std, min, max…).
 
 ---
 
 ## ⚙️ Performance tips
 
-- `swifter` auto‑detects cores & vectorises apply; for 1 M+ queries consider `Dask` mode.
-- Chunk evaluation if truth lists are extremely long (>1 K items) to limit memory.
+- Core logic is vectorised; multi‑process pandas handles millions of rows out‑of‑the‑box.  
+- Chunk evaluation if truth lists are extremely long (> 1 K items) to limit memory.
 
 ---
 
@@ -132,29 +123,29 @@ Returns `(query_report, overall_report)` where:
 
 Found a bug? Want MAP or MRR support? PRs are welcome! Please open an issue first so we can discuss the approach.
 
-1. Fork ➡️ branch ➡️ commit (with tests!)
-2. `pre‑commit run -a`
+1. Fork ➡️ branch ➡️ commit (with tests!)  
+2. `pre‑commit run -a`  
 3. Open a pull request describing the change.
 
 ---
 
 ## 🛣️ Roadmap
 
-- [ ] Mean Average Precision (MAP)
-- [ ] Mean Reciprocal Rank (MRR)
-- [ ] Optional GPU acceleration via cuDF / RAPIDS
+- [ ] Mean Average Precision (MAP)  
+- [ ] Mean Reciprocal Rank (MRR)  
+- [ ] Optional GPU acceleration via cuDF / RAPIDS  
 
 ---
 
 ## 📝 License
 
-MIT © 2025 Akash Dubey
+MIT © 2025 Akash Dubey
 
 ---
 
 ## 🔗 Links & citation
 
-- **Docs / examples**: <https://github.com/akashkdubey/ranking_validation>
+- **Docs / examples**: <https://github.com/akashkdubey/ranking_validation>  
 - **PyPI**: <https://pypi.org/project/rank-validation/>
 
 ```bibtex
@@ -166,4 +157,4 @@ MIT © 2025 Akash Dubey
 }
 ```
 
-<sub>Built with ❤️, Pandas & SciPy.</sub>
+<sub>Built with ❤️, Pandas & SciPy.</sub>
