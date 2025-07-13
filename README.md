@@ -1,6 +1,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/rank-validation?label=PyPI)](https://pypi.org/project/rank-validation/)
 [![Downloads](https://static.pepy.tech/badge/rank-validation)](https://pepy.tech/project/rank-validation)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 
 
 
@@ -134,6 +135,14 @@ Returns `(query_report, overall_report)` where:
 
 ---
 
+### Edge‑case semantics
+
+* **Empty `truth_items`** → all metrics `0.0` for that query.  
+* **Empty `pred_items`** → recall `0.0`; correlation/similarity metrics also `0.0`.  
+* **Lists shorter than *k*** → missing ranks are treated as zero gain/irrelevant.
+
+---
+
 ## ⚙️ Performance tips
 
 - Core logic is vectorised; multi‑process pandas handles millions of rows out‑of‑the‑box.  
@@ -143,11 +152,12 @@ Returns `(query_report, overall_report)` where:
 
 ## 🤝 Contributing
 
-Found a bug? Need MAP or MRR? PRs are welcome! Please open an issue first so we can discuss the approach.
+Bug report? New metric? Glad to have you! Please:
 
-1. Fork ➡️ branch ➡️ commit (with tests!)  
-2. `pre‑commit run -a`  
-3. Open a pull request describing the change.
+1. Open an issue outlining the proposal.  
+2. Fork → branch → **add unit tests**.  
+3. Run `pre‑commit run -a` & `pytest`.  
+4. Submit a pull request.
 
 ---
 
@@ -155,13 +165,15 @@ Found a bug? Need MAP or MRR? PRs are welcome! Please open an issue first so we 
 
 - [ ] Mean Average Precision (MAP)  
 - [ ] Mean Reciprocal Rank (MRR)  
-- [ ] Optional GPU acceleration via cuDF / RAPIDS  
+- [ ] Precision@k & F1@k  
+- [ ] Expected Reciprocal Rank (ERR)  
+- [ ] GPU acceleration via cuDF / RAPIDS  
 
 ---
 
 ## 📝 License
 
-MIT © 2025 Akash Dubey
+Apache License 2.0 © 2025 Akash Dubey
 
 ---
 
