@@ -23,6 +23,16 @@
 
 ---
 
+## 📢 What’s new *(v1.2.0)*
+
+* **Edge‑safe metrics**
+  * nDCG copes with queries shorter than *k*.
+  * τ‑ap avoids out‑of‑range indexing for tiny lists.
+  * RBO returns `0.0` (not `1.0`) for two empty lists.
+* **Robust helpers** &mdash; Utility functions align truth/prediction lists and zero‑pad scores.
+* **Better docs** &mdash; Input schema, edge‑case semantics and result interpretation are now documented.
+
+
 ## 🚀 Installation
 
 ```bash
