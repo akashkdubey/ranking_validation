@@ -41,6 +41,7 @@ Examples
 from __future__ import annotations
 from typing import Callable, Dict, List, Sequence, Tuple
 
+
 import numpy as np
 from scipy import stats
 import rbo as _rbo
@@ -54,52 +55,84 @@ __all__ = [
     "METRIC_REGISTRY",
 ]
 
-###############################################################################
-# nDCG
-###############################################################################
-def ndcg(
-    true_relevance: Sequence[float],
-    predicted_relevance: Sequence[float],
-    k: int,
-) -> float:
-    """Normalised Discounted Cumulative Gain (nDCG).
+
+
+def _to_fixed_length(relevance: Sequence[float], k: int) -> np.ndarray:
+    """
+    Convert any relevance list/array to a NumPy vector of length *k*.
+
+    * Truncates to the first *k* items.
+    * Pads the tail with zeros if the input is shorter than *k*.
 
     Parameters
     ----------
-    true_relevance : Sequence[float]
-        Ground-truth *graded* relevance scores (larger = more relevant).
-    predicted_relevance : Sequence[float]
-        Model-predicted scores aligned **one-to-one** with `true_relevance`.
-    k : int
-        Evaluation depth (``k >= 1``).
+    relevance
+        Relevance scores (arbitrary numeric scale).
+    k
+        Cut-off depth.
+
+    Returns
+    -------
+    np.ndarray
+        A 1-D float vector of exactly length *k*.
+    """
+    k = max(int(k), 1)
+    vec = np.asarray(relevance, dtype=float)[:k]
+    if vec.size < k:
+        vec = np.pad(vec, (0, k - vec.size), "constant")
+    return vec
+
+###############################################################################
+# nDCG
+###############################################################################
+def ndcg(true_relevance: Sequence[float],
+         predicted_relevance: Sequence[float],
+         k: int) -> float:
+    """
+    Normalised Discounted Cumulative Gain (nDCG@k).
+
+    * **Robust to short lists** – missing ranks are treated as zero gain.
+    * Uses log₂ discounts and gains 2^rel − 1 (graded relevance).
+
+    Parameters
+    ----------
+    true_relevance
+        Ground-truth relevance scores (graded). Order need **not** be sorted;
+        the function derives the ideal ranking internally.
+    predicted_relevance
+        Predicted relevance scores aligned to the same items as
+        `true_relevance`.
+    k
+        Cut-off depth (top-*k*).
 
     Returns
     -------
     float
-        nDCG ∈ ``[0.0, 1.0]``; returns ``0.0`` when the ideal DCG is zero.
-
-    Notes
-    -----
-    DCG and IDCG are computed with ``2**rel − 1`` gains and ``log₂(rank+1)``
-    discounts (Jarvelin & Kekäläinen, 2002).
+        nDCG value in `[0, 1]`. Returns `0.0` when the ideal DCG is zero.
 
     Examples
     --------
-    >>> ndcg([3, 3, 2, 0], [3, 3, 2, 0], k=3)
-    1.0
+    >>> ndcg([3, 2], [2, 3], 5)  # short lists, k larger than lengths
+    0.8339912323981488
+    >>> ndcg([], [], 5)          # completely empty query
+    0.0
     """
     k = max(int(k), 1)
-    log_denom = np.log2(np.arange(2, k + 2))
 
-    # --- Ideal DCG ----------------------------------------------------------
-    truth_sorted = np.sort(true_relevance)[::-1][:k]
-    ideal_dcg = ((2.0 ** truth_sorted - 1.0) / log_denom).sum()
-    if ideal_dcg == 0.0:  # avoid division by zero
+    # --- Prepare fixed-length relevance vectors ----------------------------
+    truth_rel = _to_fixed_length(true_relevance, k)
+    pred_rel  = _to_fixed_length(predicted_relevance, k)
+
+    log_denom = np.log2(np.arange(2, k + 2))            # length-k
+
+    # --- Ideal DCG ---------------------------------------------------------
+    ideal_sorted = np.sort(truth_rel)[::-1]             # length-k
+    ideal_dcg = ((2.0 ** ideal_sorted - 1.0) / log_denom).sum()
+    if ideal_dcg == 0.0:
         return 0.0
 
-    # --- System DCG ---------------------------------------------------------
-    sys_rel = np.asarray(predicted_relevance, dtype=float)[:k]
-    sys_dcg = ((2.0 ** sys_rel - 1.0) / log_denom).sum()
+    # --- System DCG --------------------------------------------------------
+    sys_dcg = ((2.0 ** pred_rel - 1.0) / log_denom).sum()
     return float(sys_dcg / ideal_dcg)
 
 
@@ -112,6 +145,9 @@ def recall(
     k: int,
 ) -> float:
     """Set-based recall@k (multiplicity ignored).
+
+    Duplicates are ignored (both truth and prediction are converted to sets)
+    and an empty truth list returns 0.0 by design.
 
     Parameters
     ----------
@@ -131,6 +167,8 @@ def recall(
     --------
     >>> recall(["A", "B", "C"], ["B", "A", "D"], k=3)
     0.6666...
+    >>> recall([], ['X', 'Y'], 5)   # design choice: defined as 0.0
+    0.0
     """
     if not truth_items:
         return 0.0
@@ -202,6 +240,9 @@ def tau_ap(
     Introduced by Yılmaz, Keşelj & Robertson (SIGIR 2008), τ-ap penalises
     discordant pairs more near the top of the ranking.
 
+    If the effective top-`k` window contains fewer than 2 unique items,
+    τ-ap is defined as 0.0 (no pairwise comparisons possible).
+
     Parameters
     ----------
     truth_items, pred_items : Sequence[str]
@@ -230,13 +271,18 @@ def tau_ap(
     >>> tau_ap(["A", "B", "C"], ["A", "C", "B"], k=3)
     0.6364
     """
-    k = max(int(k), 2)
 
-    # --- Deduplicate and keep first-k unique items --------------------------
-    truth = list(dict.fromkeys(truth_items))[:k]
-    pred = list(dict.fromkeys(pred_items))[:k]
+    # 0. Trivial early exit                                                  
+    if k < 2:
+        return 0.0
 
-    # --- Pad so both lists share the same elements -------------------------
+
+    # 1. Deduplicate while preserving order                                
+    truth = list(dict.fromkeys(truth_items))
+    pred  = list(dict.fromkeys(pred_items))
+
+    
+    # 2. Pad so both lists contain the same items (full union)           
     for it in truth:
         if it not in pred:
             pred.append(it)
@@ -244,27 +290,37 @@ def tau_ap(
         if it not in truth:
             truth.append(it)
 
-    # --- Rank maps (1-based) ------------------------------------------------
+    union_size = len(truth)             # == len(pred) by construction
+    if union_size < 2:
+        return 0.0
+
+    
+    # 3. Choose effective depth n = min(k, union_size)                   
+    n = min(k, union_size)
+    top_truth = truth[:n]               # the AP-weighted window
+
+    
+    # 4. Build 1-based rank maps from the *full* padded lists            
+    #    (guarantees every lookup succeeds)                              
+    
     pos_t = {it: r for r, it in enumerate(truth, 1)}
     pos_p = {it: r for r, it in enumerate(pred, 1)}
 
-    weights = np.arange(k, 0, -1, dtype=float)  # [k, k-1, …, 1]
+    # AP weights w_i = n, n-1, …, 1
+    weights = np.arange(n, 0, -1, dtype=float)
 
-    concord, discord = 0.0, 0.0
-    for i in range(k - 1):
-        for j in range(i + 1, k):
-            s_ij = np.sign(
-                (pos_t[truth[i]] - pos_t[truth[j]])
-                * (pos_p[truth[i]] - pos_p[truth[j]])
-            )
-            if s_ij > 0:
+    concord = discord = 0.0
+    for i in range(n - 1):
+        for j in range(i + 1, n):
+            u, v = top_truth[i], top_truth[j]
+            s = np.sign((pos_t[u] - pos_t[v]) * (pos_p[u] - pos_p[v]))
+            if s > 0:
                 concord += weights[i] * weights[j]
-            elif s_ij < 0:
+            elif s < 0:
                 discord += weights[i] * weights[j]
 
     denom = concord + discord
     return 0.0 if denom == 0.0 else (concord - discord) / denom
-
 
 ###############################################################################
 # Rank-Biased Overlap (RBO)
@@ -321,6 +377,9 @@ def rbo_sim(
     unique_truth = list(dict.fromkeys(truth_items))[:k]
     unique_pred = list(dict.fromkeys(pred_items))[:k]
 
+    # Handle the degenerate case of two empty rankings
+    if not unique_truth and not unique_pred:
+        return 0.0
     if unique_truth == unique_pred:
         return 1.0
 
