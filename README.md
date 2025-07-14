@@ -1,3 +1,4 @@
+[![Python versions](https://img.shields.io/pypi/pyversions/rank-validation)](https://pypi.org/project/rank-validation/)
 [![PyPI version](https://img.shields.io/pypi/v/rank-validation?label=PyPI)](https://pypi.org/project/rank-validation/)
 [![Downloads](https://static.pepy.tech/badge/rank-validation)](https://pepy.tech/project/rank-validation)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
